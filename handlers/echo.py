@@ -1,10 +1,9 @@
 from aiogram import types, Dispatcher
 
 async def echo_handler(message: types.Message):
-    if message.text.isdigit():
-        number = int(message.text)
-        squared = number ** 2
-        await message.answer(f'{number}')
+    text = message.text
+    if text.isdigit():
+        await message.answer(int(text)**2)
     else:
         await message.answer(message.text)
 
