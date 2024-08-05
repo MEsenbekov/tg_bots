@@ -1,17 +1,14 @@
-from aiogram import types
-import logging
-from config import dp, bot
-from aiogram.utils import executor
+from aiogram import types, Dispatcher
 
-@dp.message_handler()
-async def echo(message: types.Message):
-    await message.answer(message.text)
-
-
-
+async def echo_handler(message: types.Message):
+    if message.text.isdigit():
+        number = int(message.text)
+        squared = number ** 2
+        await message.answer(f'{number}')
+    else:
+        await message.answer(message.text)
 
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    executor.start_polling(dp, skip_updates=True)
+def register_echo(dp: Dispatcher):
+    dp.register_message_handler(echo_handler)
