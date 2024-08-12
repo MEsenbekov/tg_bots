@@ -3,4 +3,4 @@ from decouple import config
 
 TOKEN = config('TOKEN')
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot=bot)
+dp: Dispatcher = Dispatcher(bot=bot)

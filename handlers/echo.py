@@ -9,5 +9,9 @@ async def echo_handler(message: types.Message):
 
 
 
-def register_echo(dp: Dispatcher):
+def register_echo(dp: Dispatcher) -> object:
+    """
+
+    :rtype: object
+    """
     dp.register_message_handler(echo_handler)
