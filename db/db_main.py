@@ -1,19 +1,57 @@
-import sqlite3
-from db import queries
-
-db = sqlite3.connect('db/db.sqlite3')
-curses = db.cursor()
+import sqlite3 as sq
+from db import quaries
+db = sq.connect('db/db.sqlite3')
+cursor = db.cursor()
 
 
 async def sql_create():
     if db:
-        print('База данных SQLite3 подключена!')
-    curses.execute(queries.CREATE_TABLE_REGISTRATION)
+        print("База данных sql3lite подключенна")
+    cursor.execute(quaries.CREATE_TABLE_REGISTRATION)
     db.commit()
 
 
 async def sql_insert_registration(telegram_id, firstname):
-    # Предполагаем, что INSERT_INTO_TABLE_REGISTRATION — это строка с запросом
-    # Используем параметризованный запрос для предотвращения SQL-инъекций
-    curses.execute(queries.INSERT_INTO_TABLE_REGISTRATION, (telegram_id, firstname))
+    cursor.execute(quaries.INSERT_INTO_TABLE_REGISTRATION, (
+        telegram_id, firstname)
+                   )
+    db.commit()
+
+
+async def sql_create_store():
+    if db:
+        print("1ая часть подключена")
+    cursor.execute(quaries.CREATE_TABLE_PRODUCTS)
+    cursor.execute(quaries.CREATE_TABLE_PRODUCT_DETAILS)
+    cursor.execute(quaries.CREATE_TABLE_COLLECTION_PRODUCTS)
+    db.commit()
+
+
+async def sql_insert_products(name, size, price, product_id, photo):
+    cursor.execute(quaries.INSERT_PRODUCTS, (
+        name,
+        size,
+        price,
+        product_id,
+        photo
+    ))
+
+    db.commit()
+
+
+async def sql_insert_product_details(id_product, category, info_product):
+    cursor.execute(quaries.INSERT_PRODUCT_DEATILS, (
+        id_product,
+        category,
+        info_product
+    )
+                   )
+    db.commit()
+
+
+async def sql_insert_collection_products(product_id, collection_product):
+    cursor.execute(quaries.INSERT_COLLECTION_PRODUCTS, (
+        product_id,
+        collection_product
+    ))
     db.commit()

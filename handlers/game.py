@@ -1,86 +1,104 @@
 from aiogram import types, Dispatcher
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State, StatesGroup
 from config import bot
-import random
-
-games = ['⚽', '🎰', '🏀', '🎯', '🎳', '🎲']
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-class GameState(StatesGroup):
-    waiting_for_player_dice = State()
+async def quiz(message: types.Message):
+    button_quiz = InlineKeyboardMarkup(row_width=1)
+
+    button_quiz.add(InlineKeyboardButton("Дальше!", callback_data="button_1"))
+
+    question = 'Dark souls or casual'
+
+    answer = ['Dark souls:3', 'casual;/', 'fear and hunger(wtf)']
+
+    await bot.send_poll(
+        chat_id=message.from_user.id,
+        question=question,
+        options=answer,
+        is_anonymous=True,
+        type='quiz',
+        correct_option_id=0,
+        explanation='eblan suka tupoi',
+        open_period=60,
+        reply_markup=button_quiz
+
+    )
 
 
-async def game(message: types.Message, state: FSMContext):
-    random_game = random.choice(games)
-    bot_dice = await bot.send_dice(chat_id=message.chat.id, emoji=random_game)
-    bot_result = bot_dice.dice.value
+async def quiz_2(call: types.CallbackQuery):
+    button_quiz = InlineKeyboardMarkup(row_width=1)
 
-    await message.answer("Теперь ваша очередь! Киньте дайс.")
+    button_quiz.add(InlineKeyboardButton("Дальше!", callback_data="button_2"))
 
-    await state.update_data(bot_result=bot_result, random_game=random_game)
-    await GameState.waiting_for_player_dice.set()
+    question = 'Best game in universe'
 
+    answer = ['CS 2', 'DOTA 2', 'Valorant', 'Fortnite', 'Dark souls', 'bloodborne', 'minecraft']
 
-async def player_dice(message: types.Message, state: FSMContext):
-    if not message.dice:
-        await message.answer("Пожалуйста, киньте дайс!")
-        return
+    await bot.send_poll(
+        chat_id=call.from_user.id,
+        question=question,
+        options=answer,
+        is_anonymous=True,
+        type='quiz',
+        correct_option_id=4,
+        explanation='ОЙОЙОЙ ПИДАРААААЗ',
+        open_period=60,
+        reply_markup=button_quiz
 
-    player_result = message.dice.value
-    data = await state.get_data()
-    bot_result = data['bot_result']
-    random_game = data['random_game']
-
-    if bot_result > player_result:
-        await message.answer(f"Бот выиграл! {random_game}")
-    elif bot_result < player_result:
-        await message.answer(f"Вы выиграли! {random_game}")
-    else:
-        await message.answer(f"Ничья! {random_game}")
-
-    await state.finish()
+    )
 
 
-import logging
+async def quiz_3(call: types.CallbackQuery):
+    button_quiz = InlineKeyboardMarkup(row_width=1)
+
+    button_quiz.add(InlineKeyboardButton("Дальше!", callback_data="button_3"))
+
+    question = 'Best album of all time'
+
+    answer = ['the great dismal', 'the wall', 'dont mind the bollocks its sex pistols', 'recovery']
+
+    await bot.send_photo(chat_id=call.from_user.id,
+                         photo='https://npr.brightspotcdn.com/legacy/wp-content/uploads/gallery-221013-mini-1.jpg')
+
+    await bot.send_poll(
+        chat_id=call.from_user.id,
+        question=question,
+        options=answer,
+        is_anonymous=True,
+        type='quiz',
+        correct_option_id=0,
+        explanation='naaah',
+        open_period=60,
+        reply_markup=button_quiz
+
+    )
 
 
-async def game(message: types.Message, state: FSMContext):
-    random_game = random.choice(games)
-    bot_dice = await bot.send_dice(chat_id=message.chat.id, emoji=random_game)
-    bot_result = bot_dice.dice.value
+async def quiz_4(call: types.CallbackQuery):
 
-    logging.info(f"Бот кинул {random_game}: {bot_result}")
+    question = 'do u wanna play game?'
 
-    await message.answer("Теперь ваша очередь! Киньте дайс.")
-    await state.update_data(bot_result=bot_result, random_game=random_game)
-    await GameState.waiting_for_player_dice.set()
+    answer = ['yes sir', 'yeah', 'YASSS SLAAY', 'naaah bro']
 
+    await bot.send_photo(chat_id=call.from_user.id,
+                         photo='https://qph.cf2.quoracdn.net/main-qimg-38cc761ac297cfb5cad09b6ba7b24980-lq')
 
-async def player_dice(message: types.Message, state: FSMContext):
-    if not message.dice:
-        await message.answer("Пожалуйста, киньте дайс!")
-        return
+    await bot.send_poll(
+        chat_id=call.from_user.id,
+        question=question,
+        options=answer,
+        is_anonymous=True,
+        type='quiz',
+        correct_option_id=2,
+        explanation='теперь пропиши /game',
+        open_period=60
 
-    player_result = message.dice.value
-    data = await state.get_data()
-    bot_result = data['bot_result']
-    random_game = data['random_game']
-
-    logging.info(f"Игрок кинул {random_game}: {player_result}")
-    logging.info(f"Бот кинул {random_game}: {bot_result}")
-
-    if bot_result > player_result:
-        await message.answer(f"Бот выиграл! {random_game}")
-    elif bot_result < player_result:
-        await message.answer(f"Вы выиграли! {random_game}")
-    else:
-        await message.answer(f"Ничья! {random_game}")
-
-    await state.finish()
+    )
 
 
-def register_game(dp: Dispatcher):
-    dp.register_message_handler(game, commands=['game'], state='*')
-    dp.register_message_handler(player_dice, content_types=types.ContentType.DICE,
-                                state=GameState.waiting_for_player_dice)
+def register_quiz(dp: Dispatcher):
+    dp.register_message_handler(quiz, commands=["quiz"])
+    dp.register_callback_query_handler(quiz_2, text='button_1')
+    dp.register_callback_query_handler(quiz_3, text='button_2')
+    dp.register_callback_query_handler(quiz_4, text='button_3')

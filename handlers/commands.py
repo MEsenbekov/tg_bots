@@ -3,53 +3,69 @@ from config import bot
 import os
 from aiogram.types import InputFile
 import random
-from db import db_main
+import time
 
 
 async def start_handler(message: types.Message):
     await bot.send_message(chat_id=message.from_user.id,
-                           text='Привет!')
-    # await message.answer(text='Привет')
-
-    print(message.from_user.id)
-
-    await db_main.sql_insert_registration(telegram_id=message.from_user.id,
-                                          firstname=message.from_user.first_name)
+                           text='Добро пожаловать!')
 
 
 async def info_handler(message: types.Message):
-    await message.answer("Бот для группы 44-2 Backend")
+    await message.answer('Просто бот для домашки')
 
 
 async def mem_handler(message: types.Message):
-    path = 'media'
+    path = 'media_1/'
     files = []
 
     for f in os.listdir(path):
         full_path = os.path.join(path, f)
         if os.path.isfile(full_path):
             files.append(full_path)
+
     random_photo = random.choice(files)
 
     await message.answer_photo(photo=InputFile(random_photo))
 
 
-async def send_file(message: types.Message):
-    file_path = r"C:\Users\ACER\PycharmProjects\HomeTGBot\main.py"
+async def lyrics_handler(message: types.Message):
+    path = 'phrases/'
+    files = []
+    for f in os.listdir(path):
+        full_path = os.path.join(path, f)
+        if os.path.isfile(full_path):
+            files.append(full_path)
 
-    if os.path.isfile(file_path):
-        file_to_send = InputFile(file_path)
-        await bot.send_document(chat_id=message.chat.id, document=file_to_send)
+    random_phrase = random.choice(files)
+
+    await message.answer_document(document=InputFile(random_phrase))
+
+
+async def game_dice(message: types.Message):
+    await bot.send_message(chat_id=message.from_user.id, text='Игра начинается...'
+                                                              '\nПервым кидает бот, потом ваш ход')
+    dices = ['🎳’', '🎲', '🎯']
+
+    dice_1 = await bot.send_dice(message.from_user.id, emoji=random.choice(dices))
+    value1 = dice_1.dice.value
+    time.sleep(3)
+
+    dice_2 = await bot.send_dice(message.from_user.id, emoji=random.choice(dices))
+    value2 = dice_2.dice.value
+    time.sleep(5)
+
+    if value1 > value2:
+        await bot.send_message(message.from_user.id, "Бот выиграл, лол")
+    elif value1 < value2:
+        await bot.send_message(message.from_user.id, "Удивительно, вы выиграли...")
     else:
-        await message.answer("Файл не найден.")
-
-
-def register_handlers(dp: Dispatcher):
-    dp.register_message_handler(send_file, commands=['sendfile'])
+        await bot.send_message(message.from_user.id, "Ничья")
 
 
 def register_commands(dp: Dispatcher):
-    dp.register_message_handler(start_handler, commands=['start'])
-    dp.register_message_handler(info_handler, commands=['info'])
-    dp.register_message_handler(mem_handler, commands=['mem', 'photo'])
-    dp.register_message_handler(send_file, commands=['file'])
+    dp.register_message_handler(start_handler, commands="start")
+    dp.register_message_handler(info_handler, commands="info")
+    dp.register_message_handler(mem_handler, text='send tool meme')
+    dp.register_message_handler(lyrics_handler, text="send deftones lyrics")
+    dp.register_message_handler(game_dice, commands="game")
