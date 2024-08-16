@@ -1,4 +1,3 @@
-# from aiogram import types
 import logging
 import config
 from aiogram.utils import executor
